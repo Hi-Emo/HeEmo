@@ -4,34 +4,47 @@ import {
     Text,
     StyleSheet,
     Image,
+    SafeAreaView,
+    Button,
 } from 'react-native';
 
 import { getBottomSpace } from "react-native-iphone-x-helper";
 import { getStatusBarHeight } from "react-native-status-bar-height";
-import { FlatList, ScrollView } from 'react-native-gesture-handler';
-import {Calendar, CalendarList, Agenda, LocaleConfig, calendarTheme} from 'react-native-calendars';
+import { SafeAreaContext } from 'react-native-safe-area-context';
+import { TextInput } from 'react-native-gesture-handler';
+import dbCRUD from './new_db';
 
-LocaleConfig.locales['kr'] = {
-  monthNames: ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'],
-  monthNamesShort: ['1','2.','3','4','5','6','7.','8','9.','10.','11.','12.'],
-  dayNames: ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'],
-  dayNamesShort: ['일.','월.','화.','수.','목.','금.','토.'],
-  today: '오늘'
-};
-LocaleConfig.defaultLocale = 'kr';
-
-  export default class Cal extends Component<Props> {
+  export default class DB extends Component<Props> {
 
     constructor(props){
       super(props);
 
       this.state = {
-      day: 1,      // day of month (1-31)
-      month: 1,    // month of year (1-12)
-      year: 2017,  // year
-         // UTC timestamp representing 00:00 AM of this date
-      dateString: '2016-05-13' // date formatted as 'YYYY-MM-DD' string
+        id: "",
+        pw: "",
+        acc: "",
+      
      };
+
+     dbCRUD.loadAccount().then((acc) => {
+      acc = JSON.stringify(acc)
+       this.showAcc(acc)
+     })
+    }
+
+     
+
+    showAcc = accounts => {
+      this.setState({acc: accounts})
+    }
+
+
+    handlerId = text => {
+      this.setState({id: text})
+    }
+
+    handlerPw = text => {
+      this.setState({pw: text})
     }
      
   
@@ -44,50 +57,44 @@ LocaleConfig.defaultLocale = 'kr';
   
     render(){
       return(
-        <Calendar
-  // Initially visible month. Default = Date()
-  current={Date()}
-  // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-  minDate={undefined}
-  // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-  maxDate={undefined}
-  // Handler which gets executed on day press. Default = undefined
-  onDayPress={(day) => {console.log('selected day', day)}}
-  // Handler which gets executed on day long press. Default = undefined
-  onDayLongPress={(day) => {console.log('selected day', day)}}
-  // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
-  monthFormat={'yyyy MM'}
-  // Handler which gets executed when visible month changes in calendar. Default = undefined
-  onMonthChange={(month) => {console.log('month changed', month)}}
-  // Hide month navigation arrows. Default = false
-  hideArrows={true}
-  // Replace default arrows with custom ones (direction can be 'left' or 'right')
-  renderArrow={(direction) => (<Arrow/>)}
-  // Do not show days of other months in month page. Default = false
-  hideExtraDays={true}
-  // If hideArrows=false and hideExtraDays=false do not switch month when tapping on greyed out
-  // day from another month that is visible in calendar page. Default = false
-  disableMonthChange={true}
-  // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday.
-  firstDay={1}
-  // Hide day names. Default = false
-  hideDayNames={false}
-  // Show week numbers to the left. Default = false
-  showWeekNumbers={false}
-  // Handler which gets executed when press arrow icon left. It receive a callback can go back month
-  onPressArrowLeft={substractMonth => substractMonth()}
-  // Handler which gets executed when press arrow icon right. It receive a callback can go next month
-  onPressArrowRight={addMonth => addMonth()}
-  // Disable left arrow. Default = false
-  disableArrowLeft={true}
-  // Disable right arrow. Default = false
-  disableArrowRight={true}
-/>
+        <SafeAreaView>
+          <View style={{flexDirection:'row', justifyContent: 'center'}}> 
+            <Text>ID :</Text>
+            <TextInput 
+            placeholder='Input Id HERE!'
+            onChangeText={this.handlerId}
+            />
+
+          </View>
+
+          <View style={{flexDirection:'row', justifyContent: 'center'}}> 
+            <Text>PW :</Text>
+            <TextInput 
+            placeholder='Input PW HERE!'
+            onChangeText={this.handlerPw}
+            />
+
+          </View>
+
+          <View style={{justifyContent: 'center'}}> 
+            <Button 
+            title="add to DB!"
+            onPress={() => dbCRUD.runDB(this.state.id, this.state.pw, 1)}
+            />
+
+            <Button 
+            title="Select all from DB!"
+            onPress = {dbCRUD.loadAccount}
+            />
 
 
-      
+          </View>
 
-      
+          <Text>{this.state.acc}</Text>
+          
+
+        </SafeAreaView>
+  
 
       );
 

@@ -23,4 +23,4 @@ class App extends Component<props>{
           );
     }
 }
-export default withAuthenticator(App)
+export default App
